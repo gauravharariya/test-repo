@@ -1,3 +1,4 @@
+#testing
 name: Code Quality and Tests
 on:
   pull_request:
