@@ -1,0 +1,71 @@
+on:
+  workflow_call:
+    inputs:
+      APP_NAME:
+        required: true
+        type: string
+      AWS_REGION:
+        required: true
+        type: string
+      ENV:
+        required: true
+        type: string
+      TAG_ID:
+        required: true
+        type: string
+      ASSUME_ROLE:
+        required: true
+        type: string
+      SERVICE_NAME:
+        required: true
+        type: string
+      TASK_DEFINITION:
+        required: true
+        type: string
+
+jobs:
+  deploy-service:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16 
+        with:
+          role-to-assume: ${{inputs.ASSUME_ROLE}}
+          role-session-name: github-action-role
+          aws-region:   ${{inputs.AWS_REGION}}
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+            parameterPairs: "/${{inputs.APP_NAME}}/${{inputs.ENV}}/workflow/ECR = ECR,
+             /${{inputs.APP_NAME}}/${{inputs.ENV}}/workflow/ECR_IMAGE_REPO = IMAGE_REPOSITORY,
+             /${{inputs.APP_NAME}}/${{inputs.ENV}}/workflow/ECS_ACCOUNT_ID = ACCOUNT_ID,
+             /${{inputs.APP_NAME}}/${{inputs.ENV}}/workflow/ECS_CLUSTER=CLUSTER"
+            withDecryption: "true" 
+
+
+      - name: Render Environment Variables and Secret in the Task Definition
+        run: |
+          python3 deployment/render.py deployment/ecs/env.json deployment/ecs/${{ inputs.TASK_DEFINITION }} --stage ${{ inputs.ENV }} --account ${{ env.ACCOUNT_ID }} --region ${{ inputs.AWS_REGION }}
+
+      - name: Update Amazon ECS task definition with latest image id 
+        id: render-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: deployment/ecs/web-app-task-definition.json
+          container-name: ${{ inputs.ENV }}-${{ inputs.SERVICE_NAME }}-container
+          image: ${{ env.ECR}}/${{ env.IMAGE_REPOSITORY }}:${{ inputs.TAG_ID  }}
+
+      - run: cat ${{ steps.render-task-definition.outputs.task-definition }}
+
+      - name: Update ${{ env.SERVICE_NAME }} Service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
+          service: ${{ inputs.ENV }}-${{ inputs.SERVICE_NAME }}-service
+          cluster: ${{ env.CLUSTER }}
+          wait-for-service-stability: true

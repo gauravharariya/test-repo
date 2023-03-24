@@ -1,0 +1,4 @@
+-r common.txt
+
+# WSGI
+gunicorn==20.1.0

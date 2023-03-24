@@ -1,0 +1,47 @@
+{
+  "executionRoleArn": "arn:aws:iam::$account:role/$stage-galactic-core-web-ecs-execution-role",
+  "taskRoleArn": "arn:aws:iam::$account:role/$stage-galactic-core-web-ecs-execution-role",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "family": "$stage-galactic-core-web-service-task-definition",
+  "containerDefinitions": [
+    {
+      "name": "$stage-galactic-core-web-container",
+      "user": "rostra",
+      "image": "",
+      "linuxParameters": {
+        "capabilities": {
+          "drop": [
+            "NET_RAW"
+          ]
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 5000,
+          "protocol": "tcp",
+          "containerPort": 5000
+        }
+      ],
+      "command": [
+        "run-server"
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "secretOptions": null,
+        "options": {
+          "awslogs-group": "$stage-galactic-core-$region-ecs-web",
+          "awslogs-region": "$region",
+          "awslogs-stream-prefix": "$stage-galactic-core-web"
+        }
+      },
+      "environment": [],
+      "secrets": [],
+      "memoryReservation": 1024
+    }
+  ]
+}

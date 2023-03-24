@@ -1,0 +1,85 @@
+name: Deploy Galactic Core Stack to Amazon ECS
+
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  extract-env-variables:
+    name: extract-env-variables
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v3
+
+
+      - name: commit hash
+        id: commit_hash
+        shell: bash
+        run: |
+          echo "TAG_ID=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Configure Deploy Environment
+        id: env_variables
+        run: |
+          echo "APP_NAME=galactic_core" >> $GITHUB_OUTPUT
+          echo "AWS_REGION=us-east-2" >> $GITHUB_OUTPUT
+
+          if ${{ github.ref == 'refs/heads/develop' }}; then
+            echo "ENV=dev" >> $GITHUB_OUTPUT
+            echo "ASSUME_ROLE=${{vars.DEV_AWS_ASSUME_ROLE}}" >> $GITHUB_OUTPUT  
+          
+          elif ${{ startsWith(github.ref, 'refs/heads/release/') }}; then
+            echo "ENV=stage" >> $GITHUB_OUTPUT
+            echo "ASSUME_ROLE=${{vars.STAGE_AWS_ASSUME_ROLE}}" >> $GITHUB_OUTPUT  
+
+          elif ${{ github.ref == 'refs/heads/main' }}; then
+            echo "ENV=prod" >> $GITHUB_OUTPUT
+            echo "ASSUME_ROLE=${{vars.PROD_AWS_ASSUME_ROLE}}" >> $GITHUB_OUTPUT  
+      
+          else
+              echo "Unknown Stage/Branch"
+              exit 1
+          fi
+    outputs:
+      ENV: ${{ steps.env_variables.outputs.ENV }}
+      ASSUME_ROLE: ${{ steps.env_variables.outputs.ASSUME_ROLE }}
+      APP_NAME: ${{ steps.env_variables.outputs.APP_NAME}}
+      AWS_REGION: ${{ steps.env_variables.outputs.AWS_REGION}}
+      TAG_ID: ${{ steps.commit_hash.outputs.TAG_ID }}
+
+
+
+  build:
+    needs: [ extract-env-variables ]
+    if: ${{ needs.extract-env-variables.outputs.ENV != null }}
+    uses:  ./.github/workflows/reusable-ci-workflow.yml
+    with:
+      ENV: ${{ needs.extract-env-variables.outputs.ENV }}
+      ASSUME_ROLE: ${{ needs.extract-env-variables.outputs.ASSUME_ROLE }}
+      APP_NAME: ${{ needs.extract-env-variables.outputs.APP_NAME}}
+      AWS_REGION: ${{ needs.extract-env-variables.outputs.AWS_REGION }}
+      TAG_ID: ${{ needs.extract-env-variables.outputs.TAG_ID }}
+
+
+  deploy:
+    needs: [ extract-env-variables,build ]
+    if: ${{ needs.extract-env-variables.outputs.ENV != null }}
+    uses:  ./.github/workflows/reusable-cd-workflow.yml
+    with:
+      ENV: ${{ needs.extract-env-variables.outputs.ENV }}
+      ASSUME_ROLE: ${{ needs.extract-env-variables.outputs.ASSUME_ROLE }}
+      APP_NAME: ${{ needs.extract-env-variables.outputs.APP_NAME}}
+      AWS_REGION: ${{ needs.extract-env-variables.outputs.AWS_REGION }}
+      TAG_ID: ${{ needs.extract-env-variables.outputs.TAG_ID }}
+      SERVICE_NAME: galactic-core-web
+      TASK_DEFINITION: web-app-task-definition.json

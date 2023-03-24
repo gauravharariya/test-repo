@@ -1,0 +1,53 @@
+on:
+  workflow_call:
+    inputs:
+      APP_NAME:
+        required: true
+        type: string
+      AWS_REGION:
+        required: true
+        type: string
+      ENV:
+        required: true
+        type: string
+      TAG_ID:
+        required: true
+        type: string
+      ASSUME_ROLE:
+        required: true
+        type: string
+
+jobs:
+  build-service:
+    name: Build and Push Docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{inputs.ASSUME_ROLE}}
+          role-session-name: github-action-role
+          aws-region:  ${{inputs.AWS_REGION}}
+
+
+      - uses: dkershner6/aws-ssm-getparameters-action@v1
+        with:
+            parameterPairs: "/${{inputs.APP_NAME}}/${{inputs.ENV}}/workflow/ECR = ECR,
+             /${{inputs.APP_NAME}}/${{inputs.ENV}}/workflow/ECR_IMAGE_REPO = IMAGE_REPOSITORY"
+            withDecryption: "true"
+
+      - name: Login to Amazon Dev ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        run: |
+
+          # Build a docker container and push it to ECR
+          docker build -f ./Dockerfile -t ${{ env.ECR }}/${{ env.IMAGE_REPOSITORY }}:${{ inputs.TAG_ID }} .
+          docker push ${{ env.ECR}}/${{ env.IMAGE_REPOSITORY }}:${{ inputs.TAG_ID  }}

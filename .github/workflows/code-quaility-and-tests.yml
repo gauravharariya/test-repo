@@ -1,0 +1,42 @@
+name: Code Quality and Tests
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+      - release/v*
+      - hotfix/v*
+  push:
+    branches:
+      - develop
+      - master
+      - release/v*
+      - hotfix/v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: python:3.9
+
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U -r requirements/local.txt
+
+      - name: Check Code Formatting
+        run: |
+          black --check --config .black.cfg app/
+
+      - name: Check Linting Errors
+        run: |
+          export PYTHONPATH=`pwd`
+          prospector --profile-path .prospector.yml ./app
+
+      - name: Run Unit Tests
+        run: |
+          export PYTHONPATH=`pwd`
+          pytest --cov=app tests/ --cov-config=.coveragerc --cov-report html

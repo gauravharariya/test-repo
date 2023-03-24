@@ -1,0 +1,42 @@
+output-format: pylint
+
+strictness: veryhigh
+test-warnings: true
+doc-warnings: false
+
+autodetect: false
+uses:
+  - flask
+
+ignore-paths:
+  - requirements/*
+  - venv/*
+  - node_modules/*
+
+pylint:
+  disable:
+    - bare-except
+    - no-self-use
+    - abstract-method
+    - protected-access
+    - too-many-instance-attributes
+    - too-many-public-methods
+
+  options:
+    max-locals: 15
+    max-args: 7
+    max-parents: 16
+    max-line-length: 88
+    min-public-methods: 0
+    ignored-argument-names: _.*|^ignored_|^unused_|args|kwargs|request
+    good-names: i,j,k,ex,Run,_,handler500,handler404
+
+pep8:
+  disable:
+    - E722
+  options:
+    max-line-length: 88
+
+mccabe:
+  options:
+    max-complexity: 15

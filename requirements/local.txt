@@ -1,0 +1,11 @@
+-r common.txt
+# Code quality
+# ------------------------------------------------------------------------------
+pytest==7.2.0
+pytest-cov==4.0.0
+pytest-flask==1.2.0
+pytest-flask-sqlalchemy==1.1.0
+pylint==2.15.6
+prospector[with_mypy]==1.7.7 # https://github.com/PyCQA/prospector
+pylint-flask==0.6
+black==22.10.0  # https://github.com/ambv/black
