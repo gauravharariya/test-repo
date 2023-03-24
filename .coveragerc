@@ -3,6 +3,7 @@ omit=
     # no need to test config
     app/config.py
 [report]
+#testing again
 fail_under = 80
 # Regexes for lines to exclude from consideration
 exclude_lines =
