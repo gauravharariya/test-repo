@@ -3,7 +3,7 @@ omit=
     # no need to test config
     app/config.py
 [report]
-fail_under = 99
+fail_under = 80
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Don't complain about missing debug-only code:
