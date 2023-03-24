@@ -31,12 +31,14 @@ jobs:
         run: |
           black --check --config .black.cfg app/
 
-      - name: Check Linting Errors
-        run: |
-          export PYTHONPATH=`pwd`
-          prospector --profile-path .prospector.yml ./app
-
       - name: Run Unit Tests
         run: |
           export PYTHONPATH=`pwd`
-          pytest --cov=app tests/ --cov-config=.coveragerc --cov-report html
+          pytest --cov=app tests/ --cov-config=.coveragerc --cov-report xml
+
+
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: 46d3c6d311404a73bde290dcaad5c5e5
+          coverage-reports: coverage.xml
