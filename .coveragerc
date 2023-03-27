@@ -4,7 +4,7 @@ omit=
     app/config.py
 [report]
 #testing again
-fail_under = 80
+fail_under = 99
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Don't complain about missing debug-only code:
@@ -19,3 +19,6 @@ exclude_lines =
 [html]
 title = Test Coverage Report
 directory = htmlcov
+
+
+#testing abdsds
