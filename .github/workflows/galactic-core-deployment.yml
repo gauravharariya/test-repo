@@ -16,7 +16,7 @@ permissions:
 jobs:
   extract-env-variables:
     name: extract-env-variables
-    runs-on: ubuntu-latest
+    runs-on: test-runner
     steps:
       - name: Checkout Branch
         uses: actions/checkout@v3
