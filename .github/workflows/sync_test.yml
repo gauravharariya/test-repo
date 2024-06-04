@@ -72,14 +72,7 @@ jobs:
     if: github.event.inputs.environment
     runs-on: ubuntu-latest
     env:
-      SNOWFLAKE_ACCOUNT: ${{ secrets.${{ inputs.environment }}_SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ secrets.${{ inputs.environment }}_SNOWFLAKE_USER }}
-      SNOWFLAKE_PASSWORD: ${{ secrets.${{ inputs.environment }}_SNOWFLAKE_PASSWORD }}
-      VIEWFI_DECRYPTION: ${{ secrets.${{ inputs.environment }}_VIEWFI_DECRYPTION}}
-      COGNITO_CLIENT_ID: ${{ secrets.${{ inputs.environment }}_COGNITO_CLIENT_ID}}
-      COGNITO_CLIENT_SECRET: ${{ secrets.${{ inputs.environment }}_COGNITO_CLIENT_SECRET}}
-      COGNITO_TOKEN_URL: ${{ secrets.${{ inputs.environment }}_COGNITO_TOKEN_URL}}
-      GC_BASE_URL: ${{ secrets.${{ inputs.environment }}_GC_BASE_URL}}
+      SNOWFLAKE_ACCOUNT: ${{ secrets[github.event.inputs.environment + '_SNOWFLAKE_ACCOUNT'] }}
       SNOWFLAKE_RAW_DATABASE: RAW
       SNOWFLAKE_CURATED_DATABASE: CURATED
       SNOWFLAKE_CORE_DATABASE: TC_CORE
