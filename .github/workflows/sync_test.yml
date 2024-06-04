@@ -90,6 +90,10 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          
+      - name: print env variable
+        run: |
+          echo "Syncing with Snowflake account: $SNOWFLAKE_ACCOUNT"
 
       - name: Install Dependencies
         run: |
