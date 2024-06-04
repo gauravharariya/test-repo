@@ -1,4 +1,4 @@
-name: dbt Continuous Deployment
+name: SYNC ROSTRA TESTING
 
 on:
   workflow_dispatch:
@@ -72,7 +72,7 @@ jobs:
     if: github.event.inputs.environment
     runs-on: ubuntu-latest
     env:
-      SNOWFLAKE_ACCOUNT: ${{ secrets[github.event.inputs.environment + '_SNOWFLAKE_ACCOUNT'] }}
+      SNOWFLAKE_ACCOUNT: ${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', github.event.inputs.environment)] }}
       SNOWFLAKE_RAW_DATABASE: RAW
       SNOWFLAKE_CURATED_DATABASE: CURATED
       SNOWFLAKE_CORE_DATABASE: TC_CORE
