@@ -21,7 +21,7 @@ env:
 jobs:
   dbt-dev-deployment:
     name: dbt dev Deployment
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event.inputs.environment == ''
     runs-on: ubuntu-latest
     env:
       SNOWFLAKE_ACCOUNT: ${{ secrets.DEV_SNOWFLAKE_ACCOUNT }}
