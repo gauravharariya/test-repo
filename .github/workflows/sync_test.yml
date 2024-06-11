@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SNOWFLAKE_ACCOUNT: ${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', github.event.inputs.environment)] }}
-      SNOWFLAKE_RAW_DATABASE: RAW
+      SNOWFLAKE_RAW_DATABASE: ${{ github.event.inputs.environment == 'PROD' && 'PROD_RAW' || 'RAW' }}
       SNOWFLAKE_CURATED_DATABASE: CURATED
       SNOWFLAKE_CORE_DATABASE: TC_CORE
       SNOWFLAKE_PRESENTATION_DATABASE: PRESENTATION
@@ -93,7 +93,7 @@ jobs:
           
       - name: print env variable
         run: |
-          echo "Syncing with Snowflake account: $SNOWFLAKE_ACCOUNT"
+          echo "Syncing with Snowflake account: $SNOWFLAKE_RAW_DATABASE"
 
       - name: Install Dependencies
         run: |
