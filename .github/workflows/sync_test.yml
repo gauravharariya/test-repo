@@ -1,5 +1,4 @@
 name: SYNC ROSTRA TESTING
-#testingworflow
 on:
   workflow_dispatch:
     inputs:
@@ -21,27 +20,7 @@ env:
 jobs:
   dbt-dev-deployment:
     name: dbt dev Deployment
-    # if: github.ref == 'refs/heads/main' && github.event.inputs.environment == ''
     runs-on: ubuntu-latest
-    #testing workflow
-    # env:
-    #   SNOWFLAKE_ACCOUNT: ${{ secrets.DEV_SNOWFLAKE_ACCOUNT }}
-    #   SNOWFLAKE_USER: ${{ secrets.DEV_SNOWFLAKE_USER }}
-    #   SNOWFLAKE_PASSWORD: ${{ secrets.DEV_SNOWFLAKE_PASSWORD }}
-    #   VIEWFI_DECRYPTION: ${{ secrets.DEV_VIEWFI_DECRYPTION}}
-    #   COGNITO_CLIENT_ID: ${{ secrets.DEV_COGNITO_CLIENT_ID}}
-    #   COGNITO_CLIENT_SECRET: ${{ secrets.DEV_COGNITO_CLIENT_SECRET}}
-    #   COGNITO_TOKEN_URL: ${{ secrets.DEV_COGNITO_TOKEN_URL}}
-    #   GC_BASE_URL: ${{ secrets.DEV_GC_BASE_URL}}
-    #   SNOWFLAKE_RAW_DATABASE: RAW
-    #   SNOWFLAKE_CURATED_DATABASE: CURATED
-    #   SNOWFLAKE_CORE_DATABASE: TC_CORE
-    #   SNOWFLAKE_PRESENTATION_DATABASE: PRESENTATION
-    #   SNOWFLAKE_MIXPANEL_DATABASE: MIXPANEL
-    #   SNOWFLAKE_TRANSFORM_ROLE: TRANSFORMER
-    #   SNOWFLAKE_TRANSFORM_WAREHOUSE: TRANSFORM_DBT
-    #   SNOWFLAKE_PREPERATION_SCHEMA: PUBLIC
-
     steps:
       - name: Checkout Branch
         uses: actions/checkout@v2
@@ -83,48 +62,3 @@ jobs:
       - name: Sync Models, Macros & Test sqls between git and Rostra
         run: |
           python sync_git_with_rostra.py
-
-  # dbt-manual-deployment:
-  #   name: dbt manual Deployment
-  #   if: github.event.inputs.environment
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     SNOWFLAKE_ACCOUNT: ${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', github.event.inputs.environment)] }}
-  #     SNOWFLAKE_RAW_DATABASE: ${{ github.event.inputs.environment == 'PROD' && 'PROD_RAW' || 'RAW' }}
-  #     SNOWFLAKE_CURATED_DATABASE: CURATED
-  #     SNOWFLAKE_CORE_DATABASE: TC_CORE
-  #     SNOWFLAKE_PRESENTATION_DATABASE: PRESENTATION
-  #     SNOWFLAKE_MIXPANEL_DATABASE: MIXPANEL
-  #     SNOWFLAKE_TRANSFORM_ROLE: TRANSFORMER
-  #     SNOWFLAKE_TRANSFORM_WAREHOUSE: TRANSFORM_DBT
-  #     SNOWFLAKE_PREPERATION_SCHEMA: PUBLIC
-
-  #   steps:
-  #     - name: Checkout Branch
-  #       uses: actions/checkout@v2
-
-  #     - name: Enforce Python Version
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.9'
-          
-  #     - name: print env variable
-  #       run: |
-  #         echo "Syncing with Snowflake account: $SNOWFLAKE_RAW_DATABASE"
-
-  #     - name: Install Dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install -r requirements.txt
-  #         dbt deps --target dev
-
-  #     - name: Dbt Docs generate
-  #       if: always()
-  #       run: |
-  #         dbt docs generate
-  #         cd target
-  #         ls -la
-
-  #     - name: Sync Models, Macros & Test sqls between git and Rostra
-  #       run: |
-  #         python sync_git_with_rostra.py
