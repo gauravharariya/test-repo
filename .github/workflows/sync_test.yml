@@ -35,13 +35,25 @@ jobs:
           else
             echo "Unknown Stage/Branch"
           fi
-    
-      - name: setting env variables
-        run: |
-            stage = ${{ env.rostra_deployment_stage }}
-            echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', $rostra_deployment_stage )] }}" >> $GITHUB_ENV;
 
+      - name: Set SNOWFLAKE_ACCOUNT environment variable
+        run: |
+          echo "SNOWFLAKE_ACCOUNT=${{ secrets[env.rostra_deployment_stage + '_SNOWFLAKE_ACCOUNT'] }}" >> $GITHUB_ENV
+
+      - name: Print SNOWFLAKE_ACCOUNT for debugging
+        run: |
+          echo "SNOWFLAKE_ACCOUNT=$SNOWFLAKE_ACCOUNT"
 
       - name: Running python file
         run: |
           python3 test.py
+      
+      # - name: setting env variables
+      #   run: |
+      #       stage = ${{ env.rostra_deployment_stage }}
+      #       echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', $rostra_deployment_stage )] }}" >> $GITHUB_ENV;
+
+
+      # - name: Running python file
+      #   run: |
+      #     python3 test.py
