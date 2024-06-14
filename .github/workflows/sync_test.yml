@@ -23,6 +23,7 @@ jobs:
     name: dbt dev Deployment
     # if: github.ref == 'refs/heads/main' && github.event.inputs.environment == ''
     runs-on: ubuntu-latest
+    #testing workflow
     # env:
     #   SNOWFLAKE_ACCOUNT: ${{ secrets.DEV_SNOWFLAKE_ACCOUNT }}
     #   SNOWFLAKE_USER: ${{ secrets.DEV_SNOWFLAKE_USER }}
