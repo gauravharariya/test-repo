@@ -44,6 +44,6 @@ jobs:
             echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', env.rostra_deployment_stage)] }}" >> $GITHUB_ENV;
 
 
-      # - name: Running python file
-      #   run: |
-      #     python3 test.py
+      - name: Running python file
+        run: |
+          python3 test.py
