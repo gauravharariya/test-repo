@@ -42,7 +42,7 @@ jobs:
       - name: setting env variables
         run: |
             stage = ${{ env.rostra_deployment_stage }}
-            echo $stage
+            echo "$stage"
     #echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', $stage)] }}" >> $GITHUB_ENV;
 
 
