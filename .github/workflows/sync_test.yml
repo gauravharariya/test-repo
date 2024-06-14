@@ -38,4 +38,4 @@ jobs:
 
       - name: Running python file
         run: |
-          python3 test.py
+          run: echo "The value of AWS_ASSUME_ROLE is: $SNOWFLAKE_ACCOUNT"
