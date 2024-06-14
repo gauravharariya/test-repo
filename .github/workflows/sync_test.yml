@@ -36,29 +36,6 @@ jobs:
               echo "Unknown Stage/Branch"
           fi
 
-      - name: print env variable
+      - name: Running python file
         run: |
-          cat $GITHUB_ENV
-
-          
-      - name: Enforce Python Version
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          dbt deps --target dev
-
-      - name: Dbt Docs generate
-        if: always()
-        run: |
-          dbt docs generate
-          cd target
-          ls -la
-
-      - name: Sync Models, Macros & Test sqls between git and Rostra
-        run: |
-          python sync_git_with_rostra.py
+          python3 test.py
