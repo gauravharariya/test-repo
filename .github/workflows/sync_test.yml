@@ -27,14 +27,19 @@ jobs:
 
       - name: Configure Deploy Environment
         run: |
-          if ${{ github.ref == 'refs/heads/main' && github.event.inputs.environment == ''}}; then
-            echo "SNOWFLAKE_ACCOUNT=${{ secrets.DEV_SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV;
 
+          if ${{ github.ref == 'refs/heads/main' && github.event.inputs.environment == ''}}; then
+            echo "rostra_deployment_stage=dev" >> $GITHUB_ENV;
           elif ${{ github.event.inputs.environment != '' }}; then
-            echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', github.event.inputs.environment)] }}" >> $GITHUB_ENV;
+            echo "rostra_deployment_stage=${{github.event.inputs.environment}}" >> $GITHUB_ENV;
           else
-              echo "Unknown Stage/Branch"
+            echo "Unknown Stage/Branch"
           fi
+    
+      - name: setting env variables
+        run: |
+            echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', ${{env.rostra_deployment_stage}} )] }}" >> $GITHUB_ENV;
+
 
       - name: Running python file
         run: |
