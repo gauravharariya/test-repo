@@ -30,7 +30,7 @@ jobs:
           if ${{ github.ref == 'refs/heads/main' && github.event.inputs.environment == ''}}; then
             echo "SNOWFLAKE_ACCOUNT = ${{ secrets.DEV_SNOWFLAKE_ACCOUNT }}" >> $GITHUB_ENV;
 
-          elif ${{ github.event.inputs.environment }}; then
+          elif ${{ github.event.inputs.environment != '' }}; then
             echo "SNOWFLAKE_ACCOUNT = ${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', github.event.inputs.environment)] }}" >> $GITHUB_ENV;
           else
               echo "Unknown Stage/Branch"
