@@ -38,7 +38,7 @@ jobs:
 
       - name: print env variable
         run: |
-          echo "Syncing with Snowflake account" : ${{ env.SNOWFLAKE_ACCOUNT }}
+          cat $GITHUB_ENV
 
           
       - name: Enforce Python Version
