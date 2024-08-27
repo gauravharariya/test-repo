@@ -21,6 +21,9 @@ jobs:
   dbt-dev-deployment:
     name: dbt dev Deployment
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [DEV, PROD2, PROD]
     steps:
       - name: Checkout Branch
         uses: actions/checkout@v2
@@ -28,8 +31,8 @@ jobs:
       - name: Configure Deploy Environment
         run: |
 
-          if ${{ github.ref == 'refs/heads/main' && github.event.inputs.environment == ''}}; then
-            echo "rostra_deployment_stage=dev" >> $GITHUB_ENV;
+          if ${{ github.ref }} == 'refs/heads/main'; then
+            echo "rostra_deployment_stage=${{ matrix.environment }}" >> $GITHUB_ENV;
           elif ${{ github.event.inputs.environment != '' }}; then
             echo "rostra_deployment_stage=${{github.event.inputs.environment}}" >> $GITHUB_ENV;
           else
