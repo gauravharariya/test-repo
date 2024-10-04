@@ -38,7 +38,6 @@ jobs:
   dbt-rostra-sync-push:
     name: dbt-rostra-sync-push
     needs: [configure]
-    runs-on: ${{ needs.configure.outputs.runner_label }}
     if: ${{ github.event_name == 'push' }}
     strategy:
       matrix:
@@ -49,6 +48,7 @@ jobs:
             runner_label: macos-latest
           - environment: PROD
             runner_label: ubuntu-latest
+    runs-on: ${{ matrix.runner_label }}
 
     steps:
       - name: Checkout Branch
