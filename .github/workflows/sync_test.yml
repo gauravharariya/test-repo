@@ -18,9 +18,25 @@ env:
   DBT_PROFILES_DIR: ./profiles
 
 jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      runner_label: ${{ steps.set-runner.outputs.runner_label }}
+    steps:
+      - name: Set Runner Label
+        id: set-runner
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "DEV" ]]; then
+            echo "::set-output name=runner_label::self-hosted,Dataeng"
+          elif [[ "${{ github.event.inputs.environment }}" == "PROD2" ]]; then
+            echo "::set-output name=runner_label::ubuntu-latest"
+          elif [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
+            echo "::set-output name=runner_label::windows-latest"
+          fi
+          
   dbt-dev-deployment:
     name: dbt dev Deployment
-    runs-on: ubuntu-latest
+    runs-on: ${{ needs.configure.outputs.runner_label }}
     strategy:
       matrix:
         environment: [DEV, PROD2, PROD]
@@ -50,3 +66,6 @@ jobs:
       - name: Running python file
         run: |
           python3 test.py
+
+
+
