@@ -12,7 +12,7 @@ on:
           - PROD
   push:
     branches:
-      - main
+      - configure-runner
 
 env:
   DBT_PROFILES_DIR: ./profiles
@@ -27,11 +27,11 @@ jobs:
         id: set-runner
         run: |
           if [[ "${{ github.event.inputs.environment }}" == "DEV" ]]; then
-            echo "::set-output name=runner_label::self-hosted,Dataeng"
+            echo "::set-output name=runner_label::windows-latest"
           elif [[ "${{ github.event.inputs.environment }}" == "PROD2" ]]; then
             echo "::set-output name=runner_label::ubuntu-latest"
           elif [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
-            echo "::set-output name=runner_label::windows-latest"
+            echo "::set-output name=runner_label::ubuntu-latest"
           fi
           
   dbt-dev-deployment:
