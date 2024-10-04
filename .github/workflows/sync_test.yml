@@ -19,6 +19,7 @@ env:
 
 jobs:
   configure:
+    name: configure-runner
     runs-on: ubuntu-latest
     outputs:
       runner_label: ${{ steps.set-runner.outputs.runner_label }}
