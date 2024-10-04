@@ -19,20 +19,20 @@ env:
 
 jobs:
   configure:
-    name: configure-runner
+    name: configure
     runs-on: ubuntu-latest
     outputs:
-      runner_label: ${{ steps.set-runner.outputs.runner_label }}
+      runner_label: ${{ steps.env_variables.outputs.runner_label }}
     steps:
       - name: Set Runner Label
         id: set-runner
         run: |
           if [[ "${{ github.event.inputs.environment }}" == "DEV" ]]; then
-            echo "::set-output name=runner_label::windows-latest"
+            echo "runner_label=windows-latest" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event.inputs.environment }}" == "PROD2" ]]; then
-            echo "::set-output name=runner_label::ubuntu-latest"
+            echo "runner_label=ubuntu-latest" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
-            echo "::set-output name=runner_label::ubuntu-latest"
+            echo "runner_label=ubuntu-latest" >> $GITHUB_OUTPUT
           fi
           
   dbt-dev-deployment:
