@@ -21,11 +21,9 @@ jobs:
   configure:
     name: configure
     runs-on: ubuntu-latest
-    outputs:
-      runner_label: ${{ steps.env_variables.outputs.runner_label }}
     steps:
       - name: Set Runner Label
-        id: set-runner
+        id: set_runner
         run: |
           if [[ "${{ github.event.inputs.environment }}" == "DEV" ]]; then
             echo "runner_label=windows-latest" >> $GITHUB_OUTPUT
@@ -34,9 +32,12 @@ jobs:
           elif [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
             echo "runner_label=ubuntu-latest" >> $GITHUB_OUTPUT
           fi
+    outputs:
+      runner_label: ${{ steps.set_runner.outputs.runner_label }}
           
   dbt-dev-deployment:
     name: dbt dev Deployment
+    needs: [configure]
     runs-on: ${{ needs.configure.outputs.runner_label }}
     strategy:
       matrix:
