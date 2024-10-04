@@ -12,7 +12,7 @@ on:
           - PROD
   push:
     branches:
-      - configure
+      - configure-runner
 
 env:
   DBT_PROFILES_DIR: ./profiles
@@ -28,46 +28,59 @@ jobs:
           if [[ "${{ github.event.inputs.environment }}" == "DEV" ]]; then
             echo "runner_label=windows-latest" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event.inputs.environment }}" == "PROD2" ]]; then
-            echo "runner_label=ubuntu-latest" >> $GITHUB_OUTPUT
+            echo "runner_label=macos-latest" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event.inputs.environment }}" == "PROD" ]]; then
             echo "runner_label=ubuntu-latest" >> $GITHUB_OUTPUT
           fi
     outputs:
       runner_label: ${{ steps.set_runner.outputs.runner_label }}
-          
-  dbt-dev-deployment:
-    name: dbt dev Deployment
+
+  dbt-rostra-sync-push:
+    name: dbt-rostra-sync-push
     needs: [configure]
     runs-on: ${{ needs.configure.outputs.runner_label }}
+    if: ${{ github.event_name == 'push' }}
     strategy:
       matrix:
-        environment: [DEV, PROD2, PROD]
+        include:
+          - environment: DEV
+            runner_label: windows-latest
+          - environment: PROD2
+            runner_label: macos-latest
+          - environment: PROD
+            runner_label: ubuntu-latest
+
     steps:
       - name: Checkout Branch
         uses: actions/checkout@v2
 
-      - name: Configure Deploy Environment
+      - name: Configure Environment
         run: |
 
-          if ${{ github.ref  == 'refs/heads/main'}}; then
+          if ${{ github.ref == 'refs/heads/main' }}; then
             echo "rostra_deployment_stage=${{ matrix.environment }}" >> $GITHUB_ENV;
-          elif ${{ github.event.inputs.environment != '' }}; then
-            echo "rostra_deployment_stage=${{github.event.inputs.environment}}" >> $GITHUB_ENV;
           else
             echo "Unknown Stage/Branch"
           fi
 
-      # - name: print env
-      #   run : ${{ env.rostra_deployment_stage }}
 
-      - name: setting env variables
+     
+  dbt-rostra-sync-dispatch:
+    name: dbt-rostra-sync-dispatch
+    needs: [configure]
+    runs-on: ${{ needs.configure.outputs.runner_label }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Checkout Branch
+        uses: actions/checkout@v2
+
+      - name: Configure Environment
         run: |
-            echo "SNOWFLAKE_ACCOUNT=${{ secrets[format('{0}_SNOWFLAKE_ACCOUNT', env.rostra_deployment_stage)] }}" >> $GITHUB_ENV;
 
-
-      - name: Running python file
-        run: |
-          python3 test.py
-
-
+          if ${{ github.event.inputs.environment != '' }}; then
+            echo "rostra_deployment_stage=${{github.event.inputs.environment}}" >> $GITHUB_ENV;
+          else
+            echo "Unknown Stage/Branch"
+          fi
 
