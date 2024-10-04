@@ -12,7 +12,7 @@ on:
           - PROD
   push:
     branches:
-      - configure-runner
+      - configure
 
 env:
   DBT_PROFILES_DIR: ./profiles
